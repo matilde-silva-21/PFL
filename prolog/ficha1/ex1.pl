@@ -26,7 +26,18 @@ v. parent(gloria, X).
 vi. parent(jay, X), parent(X, Y).
 vii. parent(X, lily), parent(Y, X).
 viii. parent(alex, _).
-ix. 
-
-
+ix. parent(jay, X), \+ parent(gloria, X).
 */
+
+/* (d) */
+
+/*
+i. cousins(hailey, lily).
+ii. father(X, luke).
+iii. uncle(X, lily).
+iv. grandParent(X,Y) :-
+    parent(Z, X),
+    parent(X, Y).
+*/
+
+
