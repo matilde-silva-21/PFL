@@ -26,5 +26,24 @@ iv. Todos as pessoas chefiadas por um diretor exceto a Felismina.
 
 /* (b) */
 /*
-i. X = 
+i. X = supervisor ?
+ii. X = engenheiro,
+    Y = supervisor ?
+iii. J = engenheiro,
+    P = osvaldo ?
+iv. P = supervisor_chefe ?
 */
+
+/* (c) */
+
+/* i. */
+chefe(X, Y) :- cargo(B, Y), chefiado_por(B, A), cargo(A, X).
+
+/* ii. */
+mesmo_cargo_chefe(X, Y) :- cargo(B, X), cargo(C, Y), chefiado_por(B, A), chefiado_por(C, A).
+
+/* iii. */
+cargo_sem_chefe(X) :- cargo(X, Y), (\+ chefe(_, Y)).
+
+/* iv. */
+nao_chefiadas(X) :- cargo(Y, X), cargo_sem_chefe(Y).

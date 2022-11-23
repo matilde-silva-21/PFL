@@ -1,6 +1,6 @@
 /* (a) */
 leciona(adalberto, algoritmos).
-leciona(bernadete, bd).
+leciona(bernardete, bd).
 leciona(capitolino, compiladores).
 leciona(diogenes, estatistica).
 leciona(ermelinda, redes).
@@ -54,9 +54,9 @@ alunos(X, Z) :- leciona(X, Y), frequenta(Z, Y).
 /*iii.*/
 professores(X, Z) :- leciona(Z, Y), frequenta(X, Y).
 /*iv.*/
-dois_prof(X, Y, W) :- professores(X, W), professores(Y, W).
+dois_prof(X, Y, W) :- aluno(W, X), aluno(W, Y).  % EU PASSEI UMA HORA NESTA ALINEA PORQUE OS PROFESSORES ESCOLHERAM NOMES CONFUSOS DE ESCREVER COMO BERNARDETE
 /*v.*/
-
+colega(X, Y) :- (frequenta(X, Z), frequenta(Y, Z)) ; (leciona(X, _) , leciona(Y, _), X\=Y).
 /*vi.*/
-
+frequenta_mais(X) :- findall(X, frequenta(X, _), L), length(L,N) , N > 1.
 
