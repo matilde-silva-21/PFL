@@ -1,3 +1,7 @@
 [submodule "trabalho1"]
 	path = haskell/trabalho1
 	url = https://github.com/matilde-silva-21/trabalho1PFL
+	
+[submodule "trabalho2"]
+	path = prolog/trabalho2
+	url = https://github.com/matilde-silva-21/trabalho2PFL
