@@ -38,14 +38,57 @@ most_diversified(Company) :-
     setof([Comp, Flights], setof(Destination, (Origin, Code, Hour, Duration)^flight(Origin, Destination, Comp, Code, Hour, Duration), Flights), Array),
     countCompany(Array, _B, Company, 0, _A).
 
+/* (e) */
 
-/* (c) */
+invert(Xs, Rev):- invert(Xs, [], Rev).
+
+invert([], Rev, Rev).
+invert([X|Xs], Acc, Rev):-
+    invert(Xs, [X|Acc], Rev).
+
 
 part_of_list(Elem, [Elem|_]).
 part_of_list(Elem, [H|T]):- H\=Elem, part_of_list(Elem, T).
 
-find_flights(Origin, Destination, Flights) :-
-    setof(Dest, (C, D, E, F)^flight(Origin, Dest, C, D, E, F), Answer).
 
-find_flights_helper(Origin, Destination, Trip) :-
-    
+connects_dfs(S, F, List):-
+    connects_dfs(S, F, [S], [], Codes),
+    invert(Codes, List).
+
+connects_dfs(F, F, _Path, Codes, Codes).
+
+connects_dfs(S, F, T, Codes, C):-
+    flight(S, N, _, Code, _, _),
+    not( part_of_list(N, T) ),
+    connects_dfs(N, F, [N|T], [Code|Codes], C).
+
+find_flights(Origin, Destination, Flights) :-
+    connects_dfs(Origin, Destination, Flights), !.
+
+
+/* (d) - ???? */
+
+connects_bfs(S, F):-
+    connects_bfs([S], F, [S]).
+
+connects_bfs([F|_], F, _V).
+connects_bfs([S|R], F, V):-
+    findall(N,
+    (flight(S, N, _, _, _, _),
+        not(part_of_list(N, V)),
+        not(part_of_list(N, [S|R]))), L),
+    append(R, L, NR),
+    connects_bfs(NR, F, [S|V]).
+
+/* (e) */
+
+find_all_flights(Origin, Destination, Flights) :-
+    setof(Copy, connects_dfs(Origin, Destination, Copy), Flights).
+
+/* (f) -- WIP */
+
+filter_flights()
+
+find_flights_least_stops(Origin, Destination, ListOfFlights, Elem) :-
+    find_all_flights(Origin, Destination, Flights).
+
