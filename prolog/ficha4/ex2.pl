@@ -38,7 +38,7 @@ most_diversified(Company) :-
     setof([Comp, Flights], setof(Destination, (Origin, Code, Hour, Duration)^flight(Origin, Destination, Comp, Code, Hour, Duration), Flights), Array),
     countCompany(Array, _B, Company, 0, _A).
 
-/* (e) */
+/* (c) */
 
 invert(Xs, Rev):- invert(Xs, [], Rev).
 
@@ -87,8 +87,27 @@ find_all_flights(Origin, Destination, Flights) :-
 
 /* (f) -- WIP */
 
-filter_flights()
+smallestFlight([], _, A, A).
 
-find_flights_least_stops(Origin, Destination, ListOfFlights, Elem) :-
-    find_all_flights(Origin, Destination, Flights).
+smallestFlight([H|ListOfFlights], Length, Flight, Small):-
+    length(H, L),
+    ((L < Length,
+    NewFlight = H,
+    NewLength is L,
+    smallestFlight(ListOfFlights, NewLength, NewFlight, Small)) ; 
+    (
+    smallestFlight(ListOfFlights, Length, Flight, Small)
+    )).
+
+
+filter_flights([H|ListOfFlights], List):-
+    length(H, L),
+    smallestFlight([H|ListOfFlights], L, _A, SmallestFlight), !,
+    length(SmallestFlight, L1),
+    setof(Flight, (member(Flight, [H|ListOfFlights]), length(Flight, L2), L1 =:= L2), List).
+
+
+find_flights_least_stops(Origin, Destination, ListOfFlights) :-
+    find_all_flights(Origin, Destination, List1),
+    filter_flights(List1, ListOfFlights).
 
