@@ -85,7 +85,7 @@ connects_bfs([S|R], F, V):-
 find_all_flights(Origin, Destination, Flights) :-
     setof(Copy, connects_dfs(Origin, Destination, Copy), Flights).
 
-/* (f) -- WIP */
+/* (f) */
 
 smallestFlight([], _, A, A).
 
