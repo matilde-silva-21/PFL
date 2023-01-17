@@ -51,19 +51,20 @@ part_of_list(Elem, [Elem|_]).
 part_of_list(Elem, [H|T]):- H\=Elem, part_of_list(Elem, T).
 
 
-connects_dfs(S, F, List):-
-    connects_dfs(S, F, [S], [], Codes),
-    invert(Codes, List).
+connects_dfs(S, F, List, Cities):-
+    connects_dfs(S, F, [S], [], Codes, Path),
+    invert(Codes, List),
+    invert(Path, Cities).
 
-connects_dfs(F, F, _Path, Codes, Codes).
+connects_dfs(F, F, Path, Codes, Codes, Path).
 
-connects_dfs(S, F, T, Codes, C):-
+connects_dfs(S, F, T, Codes, C, P):-
     flight(S, N, _, Code, _, _),
     not( part_of_list(N, T) ),
-    connects_dfs(N, F, [N|T], [Code|Codes], C).
+    connects_dfs(N, F, [N|T], [Code|Codes], C, P).
 
 find_flights(Origin, Destination, Flights) :-
-    connects_dfs(Origin, Destination, Flights), !.
+    connects_dfs(Origin, Destination, Flights, _Cities), !.
 
 
 /* (d) - ???? */
@@ -71,19 +72,19 @@ find_flights(Origin, Destination, Flights) :-
 connects_bfs(S, F):-
     connects_bfs([S], F, [S]).
 
-connects_bfs([F|_], F, _V).
+connects_bfs([F|_], F, _).
 connects_bfs([S|R], F, V):-
     findall(N,
     (flight(S, N, _, _, _, _),
-        not(part_of_list(N, V)),
-        not(part_of_list(N, [S|R]))), L),
+        not(member(N, V)),
+        not(member(N, [S|R]))), L),
     append(R, L, NR),
     connects_bfs(NR, F, [S|V]).
 
 /* (e) */
 
 find_all_flights(Origin, Destination, Flights) :-
-    setof(Copy, connects_dfs(Origin, Destination, Copy), Flights).
+    setof(Copy, (Copy, Cities)^connects_dfs(Origin, Destination, Copy, Cities), Flights).
 
 /* (f) */
 
@@ -109,5 +110,46 @@ filter_flights([H|ListOfFlights], List):-
 
 find_flights_least_stops(Origin, Destination, ListOfFlights) :-
     find_all_flights(Origin, Destination, List1),
-    filter_flights(List1, ListOfFlights).
+    filter_flights(List1, ListOfFlights), !.
+
+/* (g) */
+
+contains_all_elements(_, []).
+contains_all_elements(OriginalList, [H|ElemList]) :-
+    member(H, OriginalList),
+    contains_all_elements(OriginalList, ElemList).
+
+
+find_flights_stops(Origin, Destination, Stops, ListFlights) :-
+    setof(Codes, (Codes, Cities)^(connects_dfs(Origin, Destination, Codes, Cities), contains_all_elements(Cities, Stops)), ListFlights).
+
+
+/* (h) */
+
+connects_dfs_cycle(S, F, List, Cities):-
+    connects_dfs_cycle(S, F, [S], [], Codes, Path, S),
+    invert(Codes, List),
+    invert(Path, Cities).
+
+connects_dfs_cycle(F, F, Path, Codes, Codes, Path, _Start) :-
+    (length(Codes, L) , L > 0).
+
+connects_dfs_cycle(S, F, T, Codes, C, P, Start):-
+    flight(S, N, _, Code, _, _),
+    ((not( part_of_list(N, T) )) ; (N == Start)),
+    connects_dfs_cycle(N, F, [N|T], [Code|Codes], C, P, Start).
+
+
+find_circular_trip(MaxSize, Origin, Cycle) :-
+    connects_dfs_cycle(Origin, Origin, Codes, _), 
+    length(Codes, L), L < MaxSize, !,
+    Cycle = Codes.
+
+
+/* (i) */
+
+find_circular_trips(MaxSize, Origin, Cycle) :-
+    findall(Codes, (connects_dfs_cycle(Origin, Origin, Codes, _), length(Codes, L), L < MaxSize), L1), !,
+    sort(L1, Cycle).    
+
 
